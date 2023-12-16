@@ -42,9 +42,15 @@ body {
 	display: flex;
 	overflow-x: auto;
 	scroll-snap-type: x mandatory;
+	counter-reset: div;
 	/* Optional styles */
 	scrollbar-width: none; /* For Firefox */
 	-ms-overflow-style: none;  /* For Internet Explorer and Edge */
+}
+
+.scroll-item:before {
+	counter-increment: div;
+	content: "Page " counter(div) ": ";
 }
 
 .scroll-container::-webkit-scrollbar {
@@ -54,7 +60,7 @@ body {
 .scroll-item {
 	flex: 0 0 auto;
 	width: 600px;
-  height: 800px;
+    height: 800px;
 	margin: 10px;
 	scroll-snap-align: start;
 

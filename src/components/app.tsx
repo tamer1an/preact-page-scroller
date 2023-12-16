@@ -1,10 +1,10 @@
 import {h} from 'preact';
-import Header from './header';
+import Book from './book';
 
 const App = () => {
     return (
         <div>
-            <Header />
+            <Book />
         </div>
     );
 }

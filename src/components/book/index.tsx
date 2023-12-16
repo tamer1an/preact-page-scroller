@@ -2,8 +2,8 @@ import { h } from 'preact';
 import {signal} from '@preact/signals';
 import {useEffect, useRef} from 'preact/hooks';
 import {fetchFileContent} from './fetchUtils';
+import {debounce} from 'lodash';
 import Hammer from 'hammerjs';
-import { debounce } from 'lodash';
 
 // Define signals outside the component
 const fileContent = signal('');
@@ -13,15 +13,15 @@ const error = signal(null);
 // Call the fetch function immediately to load data
 fetchFileContent(fileContent, loading, error);
 
-const regex = /#+/g;
+const regExpLineBR = /#+/g;
 const columns = 3;
 
-const Header = () => {
+const Book = () => {
 	const containerRef = useRef(null);
 	if (loading.value) return <p>Loading...</p>;
 	if (error.value) return <p>Error loading file: {error.value}</p>;
 
-	const text = fileContent.value.replaceAll(regex,'<br>');
+	const text = fileContent.value.replaceAll(regExpLineBR,'<br>');
 	const words = text.split(' ');
 	const wordsPerColumn = Math.ceil(words.length / columns);
 
@@ -39,6 +39,7 @@ const Header = () => {
 	const debouncedHandlePanLeft = debounce(panleft, 200);
 	const debouncedHandlePanRight = debounce(panright, 200);
 
+	// eslint-disable-next-line react-hooks/rules-of-hooks
 	useEffect(() => {
 		if (containerRef.current) {
 			containerRef.current.scrollLeft = 0;
@@ -54,19 +55,18 @@ const Header = () => {
 				containerRef.current.appendChild(columnDiv);
 			}
 		}
-	},[])
+	},[debouncedHandlePanLeft, debouncedHandlePanRight, words, wordsPerColumn])
 
 	return (
 		<div>
 			<p>File Content:</p>
 			<div id="app">
 				<main>
-					<div class="scroll-container" ref={containerRef}>
-					</div>
+					<section class="scroll-container" ref={containerRef} />
 				</main>
 			</div>
 		</div>
 	);
 };
 
-export default Header;
+export default Book;
