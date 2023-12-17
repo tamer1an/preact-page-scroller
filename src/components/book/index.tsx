@@ -18,6 +18,7 @@ const columns = 3;
 
 const Book = () => {
 	const containerRef = useRef(null);
+	const canvasRef = useRef<HTMLCanvasElement>(null);
 	if (loading.value) return <p>Loading...</p>;
 	if (error.value) return <p>Error loading file: {error.value}</p>;
 
@@ -30,12 +31,19 @@ const Book = () => {
 	const panleft = (e) => {
 		// Scroll the element to the right
 		e.target.parentElement.scrollLeft += 400;
-		console.log('left', e.target.parentElement.scrollLeft)
 	}
 	const panright = (e) => {
 		// Scroll the element to the left
 		e.target.parentElement.scrollLeft -= 400;
-		console.log('right', e.target.parentElement.scrollLeft)
+	}
+
+	const canvasPanLeft = () => {
+		// Scroll the element to the right
+		console.log('left', 'page scroll Left');
+	}
+	const canvasPanRight = () => {
+		// Scroll the element to the left
+		console.log('right', 'page scroll right')
 	}
 
 	const debouncedHandlePanLeft = debounce(panleft, 200);
@@ -57,7 +65,43 @@ const Book = () => {
 				containerRef.current.appendChild(columnDiv);
 			}
 		}
-	},[debouncedHandlePanLeft, debouncedHandlePanRight, words, wordsPerColumn])
+		if (canvasRef.current) {
+			const ctx = canvasRef.current.getContext('2d');
+			const dpr = window.devicePixelRatio || 1;
+			ctx.scale(dpr, dpr);
+			const maxWidth = canvasRef.current.width - 20; // Margin
+			const lineHeight = 25;
+			const x = 10;
+			let y = 25;
+
+			ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+			ctx.font = '16px Arial';
+			ctx.fillStyle = 'white';
+
+			// Split the text into words
+			const words = text.split(' ');
+			let line = '';
+
+			for (let n = 0; n < words.length; n++) {
+				const testLine = `${line + words[n]  } `;
+				const metrics = ctx.measureText(testLine);
+				const testWidth = metrics.width;
+
+				if (testWidth > maxWidth && n > 0) {
+					ctx.fillText(line, x, y);
+					line = `${words[n]  } `;
+					y += lineHeight;
+				} else {
+					line = testLine;
+				}
+			}
+
+			ctx.fillText(line, x, y);
+			const hammerCanvas = new Hammer(canvasRef.current);
+			hammerCanvas.on('panleft', canvasPanLeft);
+			hammerCanvas.on('panright', canvasPanRight);
+		}
+	},[debouncedHandlePanLeft, debouncedHandlePanRight, text, words, wordsPerColumn]);
 
 	return (
 		<div>
@@ -66,6 +110,13 @@ const Book = () => {
 				<main>
 					<section class="scroll-container" ref={containerRef} />
 				</main>
+				<hr />
+				<canvas
+					ref={canvasRef}
+					width="700"
+					height="800"
+					className="canvas"
+				/>
 			</div>
 		</div>
 	);

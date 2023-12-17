@@ -1,1 +1,7 @@
 /*@media (max-width: 639px) {  }*/
+.canvas {
+    border: 1px solid black;
+    margin: 20px auto;
+    display: block;
+    padding: 20px;
+}
