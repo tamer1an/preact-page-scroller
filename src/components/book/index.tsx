@@ -23,7 +23,9 @@ const Book = () => {
 
 	const text = fileContent.value.replaceAll(regExpLineBR,'<br>');
 	const words = text.split(' ');
-	const wordsPerColumn = Math.ceil(words.length / columns);
+	// todo: include BR transformation and page number to remove correction const
+	const correction = 20;
+	const wordsPerColumn = Math.ceil(words.length / columns - correction);
 
 	const panleft = (e) => {
 		// Scroll the element to the right

@@ -46,6 +46,7 @@ body {
 	/* Optional styles */
 	scrollbar-width: none; /* For Firefox */
 	-ms-overflow-style: none;  /* For Internet Explorer and Edge */
+	overflow-y: hidden;
 }
 
 .scroll-item:before {
@@ -53,8 +54,24 @@ body {
 	content: "Page " counter(div) ": ";
 }
 
+/*.scroll-container::-webkit-scrollbar {*/
+/*	display: none; !* For Chrome, Safari, and Opera *!*/
+/*}*/
+
 .scroll-container::-webkit-scrollbar {
-	display: none; /* For Chrome, Safari, and Opera */
+	height: 12px; /* Height of scrollbar for Chrome, Safari, and Opera */
+}
+
+.scroll-container::-webkit-scrollbar-track {
+	background: #f1f1f1; /* Track color */
+}
+
+.scroll-container::-webkit-scrollbar-thumb {
+	background: #888; /* Handle color */
+}
+
+.scroll-container::-webkit-scrollbar-thumb:hover {
+	background: #555; /* Handle color on hover */
 }
 
 .scroll-item {
