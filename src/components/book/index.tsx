@@ -1,14 +1,14 @@
-import { h } from 'preact';
-import {signal} from '@preact/signals';
+import {FunctionalComponent, h} from 'preact';
+import {Signal, signal} from '@preact/signals';
 import {useEffect, useRef} from 'preact/hooks';
 import {fetchFileContent} from './fetchUtils';
 import {debounce} from 'lodash';
 import Hammer from 'hammerjs';
 
 // Define signals outside the component
-const fileContent = signal('');
-const loading = signal(true);
-const error = signal(null);
+const fileContent: Signal<string> = signal('');
+const loading: Signal<boolean> = signal(true);
+const error: Signal<string> = signal(null);
 
 // Call the fetch function immediately to load data
 fetchFileContent(fileContent, loading, error);
@@ -16,17 +16,17 @@ fetchFileContent(fileContent, loading, error);
 const regExpLineBR = /#+/g;
 const columns = 3;
 
-const Book = () => {
-	const containerRef = useRef(null);
+const Book: FunctionalComponent = () => {
+	const containerRef = useRef<HTMLTableSectionElement>(null);
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	if (loading.value) return <p>Loading...</p>;
 	if (error.value) return <p>Error loading file: {error.value}</p>;
 
-	const text = fileContent.value.replaceAll(regExpLineBR,'<br>');
-	const words = text.split(' ');
+	const text: string = fileContent.value.replaceAll(regExpLineBR,'<br>');
+	const words: string[] = text.split(' ');
 	// todo: include BR transformation and page number to remove correction const
 	const correction = 20;
-	const wordsPerColumn = Math.ceil(words.length / columns - correction);
+	const wordsPerColumn: number = Math.ceil(words.length / columns - correction);
 
 	const panleft = (e) => {
 		// Scroll the element to the right
@@ -54,19 +54,19 @@ const Book = () => {
 		if (containerRef.current) {
 			containerRef.current.scrollLeft = 0;
 			for (let i = 0; i < columns; i++) {
-				const columnText = words.slice(i * wordsPerColumn, (i + 1) * wordsPerColumn).join(' ');
+				const columnText: string = words.slice(i * wordsPerColumn, (i + 1) * wordsPerColumn).join(' ');
 				// Create a new div and add the text
-				const columnDiv = document.createElement('div');
+				const columnDiv: HTMLDivElement = document.createElement('div');
 				columnDiv.classList.add('scroll-item');
 				columnDiv.textContent = columnText;
-				const hammer = new Hammer(columnDiv);
+				const hammer: HammerManager = new Hammer(columnDiv);
 				hammer.on('panleft', debouncedHandlePanLeft);
 				hammer.on('panright', debouncedHandlePanRight);
 				containerRef.current.appendChild(columnDiv);
 			}
 		}
 		if (canvasRef.current) {
-			const ctx = canvasRef.current.getContext('2d');
+			const ctx: CanvasRenderingContext2D = canvasRef.current.getContext('2d');
 			const dpr = window.devicePixelRatio || 1;
 			ctx.scale(dpr, dpr);
 			const maxWidth = canvasRef.current.width - 20; // Margin
@@ -79,13 +79,13 @@ const Book = () => {
 			ctx.fillStyle = 'white';
 
 			// Split the text into words
-			const words = text.split(' ');
+			const words: string[] = text.split(' ');
 			let line = '';
 
 			for (let n = 0; n < words.length; n++) {
 				const testLine = `${line + words[n]  } `;
-				const metrics = ctx.measureText(testLine);
-				const testWidth = metrics.width;
+				const metrics: TextMetrics = ctx.measureText(testLine);
+				const testWidth: number = metrics.width;
 
 				if (testWidth > maxWidth && n > 0) {
 					ctx.fillText(line, x, y);
@@ -97,7 +97,7 @@ const Book = () => {
 			}
 
 			ctx.fillText(line, x, y);
-			const hammerCanvas = new Hammer(canvasRef.current);
+			const hammerCanvas: HammerManager = new Hammer(canvasRef.current);
 			hammerCanvas.on('panleft', canvasPanLeft);
 			hammerCanvas.on('panright', canvasPanRight);
 		}
